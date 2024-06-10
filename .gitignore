@@ -1,0 +1,22 @@
+### react template
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+/build/
+
+psd
+thumb
+sketch
+
+.env
+/vk-hosting-config.json
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
