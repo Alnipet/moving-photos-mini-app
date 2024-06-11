@@ -31,6 +31,12 @@ export default defineConfig({
       targets: ['defaults', 'not IE 11'],
     }),
   ],
+  css: {
+    devSourcemap: true,
+    modules: {
+      localsConvention: "camelCase"
+    }
+  },
 
   server: {
     port: 5173,

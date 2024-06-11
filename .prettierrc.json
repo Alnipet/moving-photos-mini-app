@@ -1,0 +1,9 @@
+{
+  "trailingComma": "es5",
+  "printWidth": 120,
+  "tabWidth": 4,
+  "endOfLine": "auto",
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "parser": "babel-ts"
+}
