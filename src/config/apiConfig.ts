@@ -1,3 +1,3 @@
 export const apiConfig = {
-  apiVersion: '5.199'
-}
+    apiVersion: "5.199",
+};
