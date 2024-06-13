@@ -32,5 +32,33 @@
   display: flex;
   align-items: center;
   justify-content: end;
+
+  .target-album-text {
+    margin-left: 5px;
+    flex-grow: 1;
+
+    .targetAlbumName {
+      display: inline-block;
+      padding: 5px;
+      color: #1e90ffff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #1e90ffbb;
+        transition: color 0.3s ease;
+      }
+    }
+  }
+}
+
+.likes-wrapper {
+  display: flex;
+
+  .likes-img {
+    width: 20px;
+    height: 20px;
+    background: url("../../assets/like-svgrepo-com.svg") center no-repeat;
+  }
 }
 

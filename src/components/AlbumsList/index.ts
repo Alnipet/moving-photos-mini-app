@@ -1,0 +1,1 @@
+export {AlbumsList} from "./AlbumsList";

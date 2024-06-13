@@ -7,32 +7,35 @@ import {
     PanelHeader,
     PanelHeaderBack,
     SimpleCell,
+    SplitCol,
+    SplitLayout,
     usePlatform,
     View,
 } from "@vkontakte/vkui";
 import vkBridge, { UserInfo } from "@vkontakte/vk-bridge";
-import { AlbumsList } from "../components/AlbumsList/AlbumsList.tsx";
-import { PhotoList } from "../components/PhotoList/PhotoList.tsx";
+import { AlbumsList } from "../components/AlbumsList";
+import { PhotoList } from "../components/PhotoList";
+import { Album, Photo } from "../types/interfaces.ts";
 
-export interface HomeProps extends NavIdProps {
+interface IProps extends NavIdProps {
     fetchedUser?: UserInfo & { token?: string };
     userData: { userId: number; token: string } | null;
-    albums: any[];
-    photos: any[];
+    albums: Album[];
+    photos: Photo[];
     handleGetPhoto: (id: number) => Promise<void>;
     popout: ReactNode | null;
 }
 
-export const Home: FC<HomeProps> = ({ fetchedUser, userData, albums, photos, handleGetPhoto }) => {
+export const Home: FC<IProps> = ({ fetchedUser, userData, albums, photos, handleGetPhoto, popout }) => {
     const [activePanel, setActivePanel] = useState<string>("albumList");
-    const [activeAlbumId, setActiveAlbumId] = useState<number | null>(null);
+    const [activeAlbum, setActiveAlbum] = useState<{ id: number; title?: string } | null>(null);
+    const [targetAlbum, setTargetAlbum] = useState<{ id: number; title?: string } | null>(null);
 
     const platform = usePlatform();
 
     const { photo_200, city, first_name, last_name } = { ...fetchedUser };
 
-    const handleMovePhoto = async (arg: { albumId: number; selectedPhotoIds: string[] }) => {
-        console.log({ userData });
+    const handleMovePhoto = async (arg: { albumId: number; selectedPhotoIds: number[] }) => {
         if (!userData) {
             return console.log("User undefined");
         }
@@ -41,77 +44,92 @@ export const Home: FC<HomeProps> = ({ fetchedUser, userData, albums, photos, han
             return console.log("User token undefined");
         }
 
-        console.log(arg);
-        const fetchedMove = Promise.all(
-            arg.selectedPhotoIds.map(id => {
-                return vkBridge
-                    .send("VKWebAppCallAPIMethod", {
-                        method: "photos.move",
-                        params: {
-                            owner_id: userData.userId,
-                            v: "5.131",
-                            access_token: userData.token as string,
-                            target_album_id: arg.albumId,
-                            photo_id: id,
-                        },
-                    })
-                    .finally(() => activeAlbumId && handleGetPhoto(activeAlbumId));
+        await Promise.all(
+            arg.selectedPhotoIds.map(async id => {
+                return await vkBridge.send("VKWebAppCallAPIMethod", {
+                    method: "photos.move",
+                    params: {
+                        owner_id: userData.userId,
+                        v: "5.131",
+                        access_token: userData.token as string,
+                        target_album_id: arg.albumId,
+                        photo_id: id,
+                    },
+                });
             })
-        );
+        )
+            .then(() => {
+                setTargetAlbum({ id: arg.albumId, title: albums.find(el => el.id === arg.albumId)?.title });
+            })
+            .finally(() => {
+                activeAlbum && handleGetPhoto(activeAlbum.id);
+            });
+    };
 
-        console.log({ fetchedMove });
+    const goToAlbum = async (arg: { id: number; albumTitle?: string }) => {
+        await handleGetPhoto(arg.id);
+        setActiveAlbum(arg);
+        setActivePanel("photoList");
+        setTargetAlbum(null);
     };
 
     const albumOptions = albums.map(album => {
         return {
-            label: album.title,
+            label: album.title ?? "",
             value: album.id,
-            avatar: album.sizes[0].url,
+            avatar: album.sizes && album.sizes[0].url,
         };
     });
 
     return (
-        <>
-            {platform === "vkcom" && fetchedUser && (
-                <Group>
-                    <SimpleCell
-                        before={photo_200 && <Avatar src={photo_200} />}
-                        subtitle={city?.title}
-                        expandable="auto"
-                    >
-                        {`${first_name} ${last_name}`}
-                    </SimpleCell>
-                </Group>
-            )}
+        <SplitLayout center popout={popout}>
+            <SplitCol>
+                {platform === "vkcom" && fetchedUser && (
+                    <Group>
+                        <SimpleCell
+                            before={photo_200 && <Avatar src={photo_200} />}
+                            subtitle={city?.title}
+                            expandable="auto"
+                        >
+                            {`${first_name} ${last_name}`}
+                        </SimpleCell>
+                    </Group>
+                )}
 
-            <View activePanel={activePanel}>
-                <Panel mode={"plain"} id={"albumList"}>
-                    <AlbumsList
-                        albums={albums}
-                        handleGetPhoto={async id => {
-                            await handleGetPhoto(id);
-                            setActiveAlbumId(id);
-                            setActivePanel("photoList");
-                        }}
-                    />
-                </Panel>
-                <Panel id={`photoList`}>
-                    <PanelHeader
-                        before={
-                            <PanelHeaderBack
-                                label={platform === "vkcom" ? "Назад" : undefined}
-                                onClick={() => {
-                                    setActivePanel("albumList");
-                                    setActiveAlbumId(null);
-                                }}
+                <View activePanel={activePanel}>
+                    <Panel mode={"plain"} id={"albumList"}>
+                        <AlbumsList albums={albums} goToAlbum={goToAlbum} />
+                    </Panel>
+                    <Panel id={`photoList`}>
+                        <PanelHeader
+                            before={
+                                <PanelHeaderBack
+                                    label={platform === "vkcom" ? "Назад" : undefined}
+                                    onClick={() => {
+                                        setActivePanel("albumList");
+                                        setActiveAlbum(null);
+                                        setTargetAlbum(null);
+                                    }}
+                                />
+                            }
+                        >
+                            {platform !== "vkcom" ? "Альбомы" : null}
+                        </PanelHeader>
+
+                        {activeAlbum && (
+                            <PhotoList
+                                albumOptions={albumOptions}
+                                activeAlbum={activeAlbum}
+                                targetAlbum={targetAlbum}
+                                handleReset={() => setTargetAlbum(null)}
+                                photos={photos}
+                                handleMovePhoto={handleMovePhoto}
+                                goToAlbum={goToAlbum}
                             />
-                        }
-                    >
-                        Альбомы
-                    </PanelHeader>
-                    <PhotoList albumOptions={albumOptions} photos={photos} handleMovePhoto={handleMovePhoto} />
-                </Panel>
-            </View>
-        </>
+                        )}
+                    </Panel>
+                </View>
+            </SplitCol>
+        </SplitLayout>
     );
 };

@@ -6,9 +6,11 @@ import { Home } from "./panels";
 import { UserParamsProvider } from "./context/UserParamsContext.tsx";
 import { apiConfig } from "./config/apiConfig.ts";
 
+const screenSpinner = <ScreenSpinner size="large" />;
+
 export const App = () => {
     const [fetchedUser, setFetchedUser] = useState<(UserInfo & { token?: string }) | undefined>();
-    const [popout, setPopout] = useState<ReactNode | null>(<ScreenSpinner size="large" />);
+    const [popout, setPopout] = useState<ReactNode | null>(screenSpinner);
     const [launchParams, setLaunchParams] = useState<GetLaunchParamsResponse>();
 
     const [userData, setUserData] = useState<{ userId: number; token: string } | null>(null);
@@ -16,14 +18,10 @@ export const App = () => {
     const [photos, setPhotos] = useState<any[]>([]);
 
     useEffect(() => {
-        console.log("mount");
-
         async function fetchData() {
+            setPopout(screenSpinner);
             const user = await vkBridge.send("VKWebAppGetUserInfo");
-            console.log({ user });
-
             setFetchedUser(user);
-            setPopout(null);
 
             const fetchedToken = await vkBridge.send("VKWebAppGetAuthToken", { app_id: 51943569, scope: "photos" });
             const fetchedParams = await vkBridge.send("VKWebAppGetLaunchParams");
@@ -42,6 +40,7 @@ export const App = () => {
             setUserData({ userId: user.id, token: fetchedToken.access_token });
             setLaunchParams(fetchedParams);
             setAlbums(fetchedAlbums.response.items);
+            setPopout(null);
         }
 
         fetchData().catch(console.log);
@@ -50,14 +49,11 @@ export const App = () => {
             if (!e.detail) {
                 return;
             }
-
-            if (e.detail.type === "VKWebAppCallAPIMethodResult") {
-                console.log(e.detail.data);
-            }
         });
     }, []);
 
     const handleGetPhoto = async (id: number) => {
+        setPopout(screenSpinner);
         if (!userData?.userId || !userData?.token) {
             return console.log("User data undefined");
         }
@@ -77,6 +73,7 @@ export const App = () => {
         });
 
         setPhotos(fetchedPhotos.response.items);
+        setPopout(null);
     };
 
     return (
