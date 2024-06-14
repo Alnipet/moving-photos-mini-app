@@ -8,6 +8,7 @@ logs
 node_modules
 bower_components
 /build/
+build.zip
 
 psd
 thumb

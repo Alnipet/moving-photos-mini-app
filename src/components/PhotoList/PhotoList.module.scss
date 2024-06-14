@@ -1,32 +1,3 @@
-.photo-item-wrapper {
-  position: relative;
-  overflow: hidden;
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0.9;
-
-    z-index: 99;
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  &:after {
-    content: url("../../assets/check-circle-svgrepo-com.svg");
-    position: absolute;
-
-    top: 5px;
-    right: 5px;
-    background-size: contain;
-    display: block;
-    z-index: 100;
-  }
-}
-
 .move-btn-wrapper {
   margin-top: 15px;
   display: flex;

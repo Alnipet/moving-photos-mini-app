@@ -70,6 +70,13 @@ export const PhotoList: FC<TProps> = ({
         const activated = selectedPhotoId.includes(el.id);
         return (
             <ContentCard
+                getRootRef={ref => {
+                    if (activated) {
+                        ref?.style.setProperty("opacity", "0.5");
+                    } else {
+                        ref?.style.setProperty("opacity", "1");
+                    }
+                }}
                 activated={activated}
                 hasActive={true}
                 activeMode={"opacity"}
@@ -82,7 +89,6 @@ export const PhotoList: FC<TProps> = ({
                     handleUnselectPhotoId(el.id);
                 }}
                 header={""}
-                activeClassName={styles.photoItemWrapper}
                 src={el.sizes && el.sizes[el.sizes.length - 1].url}
                 key={el.id}
                 mode="shadow"
@@ -91,7 +97,7 @@ export const PhotoList: FC<TProps> = ({
                 text={
                     <div className={styles.likesWrapper}>
                         <div className={styles.likesImg}></div>
-                        <Text style={{ lineHeight: 1.5 }} weight={"2"}>
+                        <Text style={{ lineHeight: "20px" }} weight={"2"}>
                             {el.likes?.count}
                         </Text>
                     </div>
