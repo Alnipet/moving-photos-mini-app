@@ -1,6 +1,6 @@
 name: Deploy to VK Apps
 
-on:
+'on':
   push:
     tags:
       - '*'
