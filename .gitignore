@@ -15,7 +15,6 @@ thumb
 sketch
 
 .env
-/vk-hosting-config.json
 
 # Editor directories and files
 .vscode/*
