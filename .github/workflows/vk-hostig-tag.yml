@@ -13,4 +13,4 @@ jobs:
       - name: Install dependencies
         run: npm i
       - name: VK deploy
-        run: npm run deploy
+        run: env MINI_APPS_ACCESS_TOKEN=${{ secrets.MINI_APPS_ACCESS_TOKEN }} npm run deploy
