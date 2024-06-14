@@ -6,9 +6,9 @@ name: Deploy to VK Apps
       - '*'
 jobs:
   production_deploy:
-   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-   steps:
-    - name: VK deploy
-      uses: actions/checkout@v4
-      run: npm run deploy
+    steps:
+      - uses: actions/checkout@v2
+      - name: VK deploy
+        run: npm run deploy
