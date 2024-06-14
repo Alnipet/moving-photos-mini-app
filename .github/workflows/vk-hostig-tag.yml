@@ -1,0 +1,12 @@
+name: Deploy to VK Apps
+
+'on':
+  push:
+    tags:
+      - '*'
+jobs:
+  production_deploy:
+   runs-on: ubuntu-latest
+   steps:
+    - name: VK deploy
+      run: npm run deploy
