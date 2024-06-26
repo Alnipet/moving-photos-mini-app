@@ -1,4 +1,7 @@
 # Мини приложение для платформы VK 
+![GitHub last commit](https://img.shields.io/github/last-commit/Alnipet/moving-photos-mini-app)
+![GitHub top language](https://img.shields.io/github/languages/top/Alnipet/moving-photos-mini-app)
+![GitHub language](https://img.shields.io/github/languages/count/Alnipet/moving-photos-mini-app)
 
 Добавляет функционал переноса фотографий между альбомами VK
 
